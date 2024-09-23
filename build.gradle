@@ -26,9 +26,9 @@ ext {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'  // Per RestTemplate
 	implementation 'org.apache.httpcomponents.client5:httpclient5'   // Per HttpClient
-	implementation 'org.springframework.boot:spring-boot-starter'     // Per le funzionalità di base di Spring Boot
+	implementation 'org.springframework.boot:spring-boot-starter'  // Per le funzionalità di base di Spring Boot
+	implementation 'org.apache.commons:commons-csv:1.9.0' // Per csv
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

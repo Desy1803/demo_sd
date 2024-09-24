@@ -28,6 +28,8 @@ dependencies {
 	implementation 'org.apache.httpcomponents.client5:httpclient5'   // Per HttpClient
 	implementation 'org.springframework.boot:spring-boot-starter'  // Per le funzionalità di base di Spring Boot
 	implementation 'org.apache.commons:commons-csv:1.9.0' // Per csv
+	implementation 'org.postgresql:postgresql:42.3.1' //postgres
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

@@ -1,12 +1,12 @@
 package com.example.demo_sd.services;
 
 import com.example.demo_sd.dto.BestMatchDto;
-import com.example.demo_sd.dto.GlobalQuoteDto;
-import com.example.demo_sd.responses.GlobalQuoteResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Service
 public class StockService {
@@ -40,7 +40,7 @@ public class StockService {
                 .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
                 .block(); // Blocking operation per ottenere la risposta
     }
-    //TYPE : TIME_SERIES_WEEKLY, TIME_SERIES_DAILY, TIME_SERIES_MONTHLY
+
 
     public String getSymbolicSearch(BestMatchDto bestMatchDto){
         return this.webClient.get()
@@ -56,16 +56,80 @@ public class StockService {
     }
 
 
-    public GlobalQuoteResponse getStockQuote(String function, String symbol, String datatype) {
-       /* String url = "https://api.example.com/quote?function=" + function +
-                "&symbol=" + symbol +
-                "&datatype=" + datatype +
-                "&apikey=YOUR_API_KEY"; // Replace with your API key
+    public String getStockQuote(String function, String symbol, String datatype) {
 
-        ResponseEntity<com.example.demo.dto.GlobalQuoteResponse> responseEntity = restTemplate.getForEntity(url, ApiResponseDTO.class);
-        ApiResponseDTO apiResponse = responseEntity.getBody();
+        return this.webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("symbol", symbol)
+                        .queryParam("datatype", datatype)
+                        .queryParam("apikey", API_KEY)
+                        .queryParam("function", function)
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
+                .block(); // Blocking operation per ottenere la risposta
+    }
+    //TIME_SERIES_MONTHLY_ADJUSTED, TIME_SERIES_DAILY_ADJUSTED (PREMIUM), TIME_SERIES_WEEKLY_ADJUSTED ->  function
 
-        return apiResponse != null ? apiResponse.getGlobalQuote() : null;*/
-        return null;
+    public String getGlobalMarketOpenAndCloseStatus(String function){ //function=MARKET_STATUS
+        return this.webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("apikey", API_KEY)
+                        .queryParam("function", function)
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
+                .block(); // Blocking operation per ottenere la risposta
+    }
+    public String getFundamentalData(String function, String symbol){ //function=OVERVIEW, symbol = IBM
+        return this.webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("apikey", API_KEY)
+                        .queryParam("symbol", symbol)
+                        .queryParam("function", function)
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
+                .block(); // Blocking operation per ottenere la risposta
+    }
+
+    public String getDividends(String function, String symbol){ //function=OVERVIEW, symbol = IBM
+        return this.webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("apikey", API_KEY)
+                        .queryParam("symbol", symbol)
+                        .queryParam("function", function)
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
+                .block(); // Blocking operation per ottenere la risposta
+    }
+
+    public Mono<String> sendRequestCoreStock(String function, String symbol, String datatype, String type, String keywords, String outputsize) {
+        return this.webClient.get()
+                .uri(uriBuilder -> {
+                    uriBuilder.queryParam("apikey", API_KEY);
+                    if (Objects.nonNull(function)) {
+                        uriBuilder.queryParam("function", function);
+                    }
+                    if (Objects.nonNull(symbol)) {
+                        uriBuilder.queryParam("symbol", symbol);
+                    }
+                    if (Objects.nonNull(datatype)) {
+                        uriBuilder.queryParam("datatype", datatype);
+                    }
+                    if (Objects.nonNull(type)) {
+                        uriBuilder.queryParam("type", type);
+                    }
+                    if (Objects.nonNull(keywords)) {
+                        uriBuilder.queryParam("keywords", keywords);
+                    }
+                    if (Objects.nonNull(outputsize)) {
+                        uriBuilder.queryParam("outputsize",outputsize);
+                    }
+                    return uriBuilder.build();
+                })
+                .retrieve()
+                .bodyToMono(String.class);
     }
 }

@@ -3,11 +3,13 @@ package com.example.demo_sd.controllers;
 import com.example.demo_sd.dto.UserRequest;
 import com.example.demo_sd.entities.UserEntity;
 import com.example.demo_sd.repositories.UserRepository;
+import com.example.demo_sd.responses.KeycloakResponse;
 import com.example.demo_sd.services.KeycloakService;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -24,6 +26,13 @@ public class KeycloakController {
     public KeycloakController(KeycloakService keycloakService) {
         this.keycloakService = keycloakService;
     }
+
+    @GetMapping("/hello")
+    @PreAuthorize("isAuthenticated()")
+    public String helloWorld(){
+        return "Hello world";
+    }
+
     @PostMapping("/register")
     public void registerUser(@RequestBody UserRequest user) {
         try{
@@ -41,23 +50,26 @@ public class KeycloakController {
         }
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<String> refresh(@RequestParam String refreshToken) {
+        return keycloakService.refreshToken(refreshToken, "spring");
+    }
 
-    @PostMapping
-    public ResponseEntity<UserEntity> createUser(@RequestBody UserRequest user) {
-        try{
-            System.out.println(user);
-            UserEntity savedUser = userRepository.save(user.toModel(user));
-            return ResponseEntity.ok(savedUser);
-
-        }catch (Exception e){
-            throw new RuntimeException("Couldn't save the user");
+    @PostMapping("/login")
+    public KeycloakResponse login(@RequestParam String username, @RequestParam String password) {
+        try {
+            System.out.println("login initialized");
+            KeycloakResponse response = keycloakService.loginUser(username, password);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new KeycloakResponse();
         }
     }
 
-    @GetMapping
-    public List<UserEntity> getAllUsers() {
-        return userRepository.findAll();
-    }
+
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
@@ -106,23 +118,6 @@ public class KeycloakController {
             e.printStackTrace();
             throw new RuntimeException();
         }
-
     }
 
-    @PutMapping("/assignRole/{userId}")
-    public ResponseEntity<?> assignRole(@PathVariable String userId, @RequestParam String role){
-        keycloakService.assignRole(userId, role);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @DeleteMapping("/deleteRole/{userId}")
-    public ResponseEntity<?> deleteRole(@PathVariable String userId, @RequestParam String role){
-        keycloakService.deleteRole(userId, role);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @GetMapping("/getRole/{userId}")
-    public ResponseEntity<List<RoleRepresentation>> getRole(@PathVariable String userId){
-        return ResponseEntity.status(HttpStatus.OK).body(keycloakService.getRoles(userId));
-    }
 }

@@ -1,8 +1,13 @@
 package com.example.demo_sd.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class BestMatchDto {
+    @JsonProperty
     private String function;
+    @JsonProperty
     private String keywords;
+    @JsonProperty
     private String datatype;
 
     public BestMatchDto() {

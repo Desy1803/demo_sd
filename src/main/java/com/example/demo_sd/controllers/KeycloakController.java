@@ -5,18 +5,15 @@ import com.example.demo_sd.entities.UserEntity;
 import com.example.demo_sd.repositories.UserRepository;
 import com.example.demo_sd.responses.KeycloakResponse;
 import com.example.demo_sd.services.KeycloakService;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/users/security")
+@CrossOrigin()
 public class KeycloakController {
 
     private final KeycloakService keycloakService;
@@ -27,22 +24,13 @@ public class KeycloakController {
         this.keycloakService = keycloakService;
     }
 
-    @GetMapping("/hello")
-    @PreAuthorize("isAuthenticated()")
-    public String helloWorld(){
-        return "Hello world";
-    }
 
     @PostMapping("/register")
     public void registerUser(@RequestBody UserRequest user) {
         try{
             System.out.println(user);
             keycloakService.createUser(
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getPassword()
+                    user
             );
 
         }catch (Exception e){
@@ -58,7 +46,6 @@ public class KeycloakController {
     @PostMapping("/login")
     public KeycloakResponse login(@RequestParam String username, @RequestParam String password) {
         try {
-            System.out.println("login initialized");
             KeycloakResponse response = keycloakService.loginUser(username, password);
             return response;
         } catch (Exception e) {
@@ -69,9 +56,8 @@ public class KeycloakController {
 
 
 
-
-
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
                 .map(ResponseEntity::ok)
@@ -80,6 +66,7 @@ public class KeycloakController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserEntity> updateUser(@PathVariable Long id, @RequestBody UserEntity userDetails) {
         return userRepository.findById(id)
                 .map(user -> {
@@ -91,7 +78,6 @@ public class KeycloakController {
                     user.setCity(userDetails.getCity());
                     user.setCountry(userDetails.getCountry());
                     user.setDateOfBirth(userDetails.getDateOfBirth());
-                    user.setUpdatedAt(LocalDateTime.now());
                     return ResponseEntity.ok(userRepository.save(user));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -104,6 +90,7 @@ public class KeycloakController {
     }
 
     @DeleteMapping("/{userId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteUser(@PathVariable String userId) {
         try{
             keycloakService.deleteUser(userId);

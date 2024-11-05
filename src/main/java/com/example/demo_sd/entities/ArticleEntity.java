@@ -2,11 +2,13 @@ package com.example.demo_sd.entities;
 
 
 import jakarta.persistence.*;
+import jdk.jfr.Timestamp;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "articles")  // Nome della tabella nel database
+@Table(name = "articles")
 public class ArticleEntity {
 
     @Id
@@ -22,25 +24,26 @@ public class ArticleEntity {
     @Column(name = "company", nullable = false)
     private String company;
 
+    @Column(name = "author", nullable = false)
+    private String author;
+
+
     @Column(name = "time_unit")
     private String timeUnit;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private UserEntity author;
-
     @Column(name = "created_at", nullable = false)
+    @Timestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    @Timestamp
     private LocalDateTime updatedAt;
 
-    public ArticleEntity(String title, String description, String company, String timeUnit, UserEntity author) {
+    public ArticleEntity(String title, String description, String company, String timeUnit) {
         this.title = title;
         this.description = description;
         this.company = company;
         this.timeUnit = timeUnit;
-        this.author = author;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -86,13 +89,6 @@ public class ArticleEntity {
         this.timeUnit = timeUnit;
     }
 
-    public UserEntity getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(UserEntity author) {
-        this.author = author;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -109,4 +105,15 @@ public class ArticleEntity {
     public void setUpdatedAt(LocalDateTime createdAt) {
         this.updatedAt = updatedAt;
     }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+
+
 }

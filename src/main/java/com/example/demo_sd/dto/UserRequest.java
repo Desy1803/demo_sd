@@ -4,8 +4,79 @@ import com.example.demo_sd.entities.UserEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 
-    public class UserRequest {
+public class UserRequest {
 
+        @JsonProperty("username")
+        private String username;
+
+        @JsonProperty("password")
+        private String password;
+
+        @JsonProperty("first_name")
+        private String firstName;
+
+        @JsonProperty("last_name")
+        private String lastName;
+
+        @JsonProperty("email")
+        private String email;
+
+        @JsonProperty("birthday")
+        private LocalDate birthday;
+
+        @JsonProperty("phone_number")
+        private String phoneNumber;
+
+        @JsonProperty("address")
+        private String address;
+
+        @JsonProperty("city")
+        private String city;
+
+        @JsonProperty("country")
+        private String country;
+
+
+
+        public void setUsername(String username) {
+        this.username = username;
+        }
+
+        public void setPassword(String password) {
+        this.password = password;
+        }
+
+        public void setFirstName(String firstName) {
+        this.firstName = firstName;
+        }
+
+        public void setLastName(String lastName) {
+        this.lastName = lastName;
+        }
+
+        public void setEmail(String email) {
+        this.email = email;
+        }
+
+        public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+        }
+
+        public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+        }
+
+        public void setAddress(String address) {
+        this.address = address;
+        }
+
+        public void setCity(String city) {
+        this.city = city;
+        }
+
+        public void setCountry(String country) {
+            this.country = country;
+        }
         public String getUsername() {
             return username;
         }
@@ -45,78 +116,6 @@ import java.time.LocalDate;
         public String getCountry() {
             return country;
         }
-
-        @JsonProperty("username")
-        private String username;
-
-        @JsonProperty("password")
-        private String password;
-
-        @JsonProperty("first_name")
-        private String firstName;
-
-        @JsonProperty("last_name")
-        private String lastName;
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public void setBirthday(LocalDate birthday) {
-            this.birthday = birthday;
-        }
-
-        public void setPhoneNumber(String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-        }
-
-        public void setAddress(String address) {
-            this.address = address;
-        }
-
-        public void setCity(String city) {
-            this.city = city;
-        }
-
-        public void setCountry(String country) {
-            this.country = country;
-        }
-
-        @JsonProperty("email")
-        private String email;
-
-        @JsonProperty("birthday")
-        private LocalDate birthday;
-
-        @JsonProperty("phone_number")
-        private String phoneNumber;
-
-        @JsonProperty("address")
-        private String address;
-
-        @JsonProperty("city")
-        private String city;
-
-        @JsonProperty("country")
-        private String country;
-
-
 
         @Override
         public String toString() {

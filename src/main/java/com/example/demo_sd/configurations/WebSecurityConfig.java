@@ -46,7 +46,7 @@ public class WebSecurityConfig {
                     .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
                     .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/api/**").permitAll()
-                            .requestMatchers("/login").permitAll() // Allow access to login without auth
+                            .requestMatchers("/login").permitAll()
                             .anyRequest().authenticated()
                     )
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

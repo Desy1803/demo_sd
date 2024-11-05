@@ -34,11 +34,6 @@ public class UserEntity {
 
     @Column(name = "country")
     private String country;
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     public UserEntity(String firstName, String lastName, String email, LocalDate dateOfBirth,
                       String phoneNumber, String address, String city, String country) {
@@ -50,8 +45,6 @@ public class UserEntity {
         this.address = address;
         this.city = city;
         this.country = country;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     // Getters e Setters
@@ -127,19 +120,4 @@ public class UserEntity {
         this.country = country;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime createdAt) {
-        this.updatedAt = updatedAt;
-    }
 }

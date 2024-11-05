@@ -45,7 +45,6 @@ public class ChatClient {
         headers.set("Authorization", "Bearer " + apiKey);
         headers.set("Content-Type", "application/json");
 
-        // Body (il payload della richiesta)
         String body = "{\n" +
                 "    \"model\": \"gpt-4o-mini\",\n" +
                 "    \"messages\": [\n" +

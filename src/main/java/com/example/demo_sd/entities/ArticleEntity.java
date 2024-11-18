@@ -27,26 +27,66 @@ public class ArticleEntity {
     @Column(name = "author", nullable = false)
     private String author;
 
+    @Column(name="image_url")
+    private String imageUrl;
 
     @Column(name = "time_unit")
     private String timeUnit;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name="is_public")
+    private boolean isPublic;
+
+    @Column
+    private String category;
+
+    public boolean isAi() {
+        return isAi;
+    }
+
+    public void setAi(boolean AI) {
+        isAi = AI;
+    }
+
+    @Column(name="is_ai")
+    private boolean isAi;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    @Column(name = "created_at")
     @Timestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     @Timestamp
     private LocalDateTime updatedAt;
 
-    public ArticleEntity(String title, String description, String company, String timeUnit) {
+    public ArticleEntity(String author, String title, String description, String company, String timeUnit, boolean isAi, boolean isPublic, String category, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.author=author;
         this.title = title;
         this.description = description;
         this.company = company;
         this.timeUnit = timeUnit;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.isAi=isAi;
+        this.isPublic=isPublic;
+        this.category=category;
+        this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
     }
+    public ArticleEntity() {}
 
 
     public Long getId() {

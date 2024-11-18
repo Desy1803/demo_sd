@@ -12,10 +12,10 @@ public class UserRequest {
         @JsonProperty("password")
         private String password;
 
-        @JsonProperty("first_name")
+        @JsonProperty("firstName")
         private String firstName;
 
-        @JsonProperty("last_name")
+        @JsonProperty("lastName")
         private String lastName;
 
         @JsonProperty("email")
@@ -24,7 +24,7 @@ public class UserRequest {
         @JsonProperty("birthday")
         private LocalDate birthday;
 
-        @JsonProperty("phone_number")
+        @JsonProperty("phoneNumber")
         private String phoneNumber;
 
         @JsonProperty("address")

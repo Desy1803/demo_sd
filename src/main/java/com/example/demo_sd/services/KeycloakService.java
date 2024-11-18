@@ -89,50 +89,44 @@ public class KeycloakService {
 
 
     public void createUser(UserRequest userRequest) {
-        try{
-            Map<String, List<String>> attributes = new HashMap<>();
-            attributes.put("address", List.of(userRequest.getAddress()));
-            attributes.put("country", List.of(userRequest.getCountry()));
-            attributes.put("city", List.of(userRequest.getCity()));
-            attributes.put("address", List.of(userRequest.getAddress()));
-            attributes.put("phoneNumber", List.of(userRequest.getPhoneNumber()));
-            UserRepresentation user = new UserRepresentation();
-            user.setUsername(userRequest.getUsername());
-            user.setEmail(userRequest.getEmail());
-            user.setFirstName(userRequest.getFirstName());
-            user.setLastName(userRequest.getLastName());
-            user.setAttributes(attributes);
-            user.setEnabled(true);
-            user.setEmailVerified(false);
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("address", List.of(userRequest.getAddress()));
+        attributes.put("country", List.of(userRequest.getCountry()));
+        attributes.put("city", List.of(userRequest.getCity()));
+        attributes.put("address", List.of(userRequest.getAddress()));
+        attributes.put("phoneNumber", List.of(userRequest.getPhoneNumber()));
+        UserRepresentation user = new UserRepresentation();
+        user.setUsername(userRequest.getUsername());
+        user.setEmail(userRequest.getEmail());
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
+        user.setAttributes(attributes);
+        user.setEnabled(true);
+        user.setEmailVerified(false);
 
-            CredentialRepresentation credential = new CredentialRepresentation();
-            credential.setType(CredentialRepresentation.PASSWORD);
-            credential.setValue(userRequest.getPassword());
-            credential.setTemporary(false);
-            List<CredentialRepresentation> credentials = new ArrayList<CredentialRepresentation>();
-            credentials.add(credential);
-            user.setCredentials(credentials);
-            UsersResource userResource = getUserResource();
-            Response response = userResource.create(user);
-            if (Objects.equals(201, response.getStatus())) {
-                System.out.println("User created in Keycloak");
+        CredentialRepresentation credential = new CredentialRepresentation();
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setValue(userRequest.getPassword());
+        credential.setTemporary(false);
+        List<CredentialRepresentation> credentials = new ArrayList<>();
+        credentials.add(credential);
+        user.setCredentials(credentials);
+        UsersResource userResource = getUsersResource();
+        Response response = userResource.create(user);
+        if (Objects.equals(201, response.getStatus())) {
+            System.out.println("User created in Keycloak");
             List<UserRepresentation> userRepresentationsList = userResource.searchByUsername(userRequest.getUsername(), true);
             UserRepresentation userRepresentation= userRepresentationsList.get(0);
-            sendVerificationEmail(userRepresentation.getId());
-            } else {
-                String errorMessage = response.readEntity(String.class);
-                System.err.println("User not created. Response: " + response.getStatus() + " - " + errorMessage);
-                throw new RuntimeException("User not created. Error: " + errorMessage);
-            }
-
-        }catch(Exception e){
-            throw new RuntimeException(e);
+        } else {
+            String errorMessage = response.readEntity(String.class);
+            System.err.println("User not created. Response: " + response.getStatus() + " - " + errorMessage);
+            throw new RuntimeException("User not created. Error: " + errorMessage);
         }
 
     }
 
     public void forgotPassword(String username){
-        UsersResource usersResource = getUserResource();
+        UsersResource usersResource = getUsersResource();
         List<UserRepresentation> userRepresentationsList = usersResource.searchByUsername(username, true);
         UserRepresentation userRepresentation= userRepresentationsList.get(0);
         UserResource userResource= usersResource.get(userRepresentation.getId());
@@ -140,28 +134,45 @@ public class KeycloakService {
     }
 
     public void deleteUser(String userId){
-        UsersResource usersResource = getUserResource();
+        UsersResource usersResource = getUsersResource();
         usersResource.delete(userId);
     }
 
 
-    public void sendVerificationEmail(String userId){
-        UsersResource usersResource = getUserResource();
-        usersResource.get(userId).sendVerifyEmail();
+    public void sendVerificationEmail(String email){
+        UsersResource usersResource = getUsersResource();
+        List<UserRepresentation> userRepresentationsList = usersResource.searchByEmail(email, true);
+        System.out.println(userRepresentationsList);
+        UserRepresentation userRepresentation= userRepresentationsList.get(0);
+        usersResource.get(userRepresentation.getId()).sendVerifyEmail();
     }
-    private UsersResource getUserResource(){
+
+    public boolean verificationIsValid(String email) {
+        UsersResource usersResource = getUsersResource();
+        List<UserRepresentation> userRepresentationsList = usersResource.searchByEmail(email, true);
+
+        if (userRepresentationsList.isEmpty()) {
+            throw new IllegalArgumentException("No user found");
+        }
+
+        UserRepresentation userRepresentation = userRepresentationsList.get(0);
+
+        return userRepresentation.isEmailVerified();
+    }
+
+    private UsersResource getUsersResource(){
         return keycloak.realm(realm).users();
     }
 
     private UserResource getUser(String userId){
-        UsersResource usersResource = getUserResource();
+        UsersResource usersResource = getUsersResource();
         return usersResource.get(userId);
     }
 
 
     public String getUserIdByUsername(String username) {
         try {
-            UsersResource usersResource = getUserResource();
+            UsersResource usersResource = getUsersResource();
             List<UserRepresentation> users = usersResource.searchByUsername(username, true);
 
             if (users.isEmpty()) {

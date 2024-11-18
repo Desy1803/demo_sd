@@ -1,17 +1,17 @@
 package com.example.demo_sd.controllers;
 
-import com.example.demo_sd.dto.ArticleDto;
 import com.example.demo_sd.entities.ArticleEntity;
-import com.example.demo_sd.entities.UserEntity;
 import com.example.demo_sd.repositories.ArticleRepository;
 import com.example.demo_sd.repositories.UserRepository;
+import com.example.demo_sd.requests.ArticleRequest;
 import com.example.demo_sd.services.KeycloakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,19 +30,18 @@ public class ArticleController {
 
 
     @PostMapping
-    //@PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ArticleEntity> createArticleEntity(@RequestBody ArticleDto article, Principal principal) {
-        String username = "lala"; //TODO
-        ArticleEntity articleEntity = new ArticleEntity(article.getTitle(), article.getDescription(), article.getCompany(), article.getTimeUnit());
-        articleEntity.setAuthor(username);
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ArticleEntity> createArticleEntity(@RequestBody ArticleRequest article) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        LocalDateTime now = LocalDateTime.now();
+        ArticleEntity articleEntity = new ArticleEntity(username, article.getTitle(), article.getDescription(), article.getCompany(), article.getDate(),article.isAi(), article.isPublic(), article.getCategory(), now, now);
         articleRepository.save(articleEntity);
         return ResponseEntity.ok(articleEntity);
     }
 
-    @GetMapping
-    //@PreAuthorize("isAuthenticated()")
-    public List<ArticleEntity> getAllArticleEntities() {
-        return articleRepository.findAll();
+    @GetMapping("/public")
+    public List<ArticleEntity> getAllArticleEntitiesPublic() {
+        return articleRepository.findByIsPublicTrue();
     }
 
     @GetMapping("/{id}")

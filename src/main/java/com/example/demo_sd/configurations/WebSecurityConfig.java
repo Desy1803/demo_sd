@@ -47,6 +47,10 @@ public class WebSecurityConfig {
                     .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/api/**").permitAll()
                             .requestMatchers("/login").permitAll()
+                            .requestMatchers("/register").permitAll()
+                            .requestMatchers("/send-verification-email").permitAll()
+                            .requestMatchers("/verified-email").permitAll()
+                            .requestMatchers("articles/public").permitAll()
                             .anyRequest().authenticated()
                     )
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

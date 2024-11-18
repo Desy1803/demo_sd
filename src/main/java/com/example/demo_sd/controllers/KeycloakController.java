@@ -3,13 +3,17 @@ package com.example.demo_sd.controllers;
 import com.example.demo_sd.dto.UserRequest;
 import com.example.demo_sd.entities.UserEntity;
 import com.example.demo_sd.repositories.UserRepository;
+import com.example.demo_sd.requests.EmailVerification;
 import com.example.demo_sd.responses.KeycloakResponse;
 import com.example.demo_sd.services.KeycloakService;
+import org.jboss.resteasy.annotations.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users/security")
@@ -26,26 +30,52 @@ public class KeycloakController {
 
 
     @PostMapping("/register")
-    public void registerUser(@RequestBody UserRequest user) {
-        try{
-            System.out.println(user);
-            keycloakService.createUser(
-                    user
-            );
-
-        }catch (Exception e){
-            throw new RuntimeException("Couldn't save the user");
+    public ResponseEntity<Boolean> registerUser(@RequestBody UserRequest user) {
+        try {
+            keycloakService.createUser(user);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(@RequestParam String refreshToken) {
         return keycloakService.refreshToken(refreshToken, "spring");
     }
 
-    @PostMapping("/login")
-    public KeycloakResponse login(@RequestParam String username, @RequestParam String password) {
+    @PostMapping("/send-verification-email")
+    public ResponseEntity<Boolean> sendVerificationEmail(@RequestBody EmailVerification email){
         try {
+            keycloakService.sendVerificationEmail(email.getEmail());
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/verified-email")
+    public ResponseEntity<Boolean> isVerifiedEmail(@RequestBody EmailVerification email){
+        try {
+            boolean check = keycloakService.verificationIsValid(email.getEmail());
+            if(check)
+                return new ResponseEntity<>(true, HttpStatus.CREATED);
+            return new ResponseEntity<>(false, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public KeycloakResponse login(@RequestBody Map<String, String> credentials) {
+        String username = credentials.get("username");
+        String password = credentials.get("password");
+        try {
+            System.out.println(username + " " + password);
             KeycloakResponse response = keycloakService.loginUser(username, password);
             return response;
         } catch (Exception e) {
@@ -53,6 +83,7 @@ public class KeycloakController {
             return new KeycloakResponse();
         }
     }
+
 
 
 
@@ -83,7 +114,7 @@ public class KeycloakController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/forgotPassword")
+    @PutMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestParam String username){
         keycloakService.forgotPassword(username);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

@@ -114,10 +114,10 @@ public class KeycloakController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String username){
-        keycloakService.forgotPassword(username);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Boolean> forgotPassword(@RequestBody EmailVerification email){
+        keycloakService.forgotPassword(email.getEmail());
+        return new ResponseEntity<>(true, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{userId}")

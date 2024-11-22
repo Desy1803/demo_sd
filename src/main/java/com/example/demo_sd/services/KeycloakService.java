@@ -125,9 +125,9 @@ public class KeycloakService {
 
     }
 
-    public void forgotPassword(String username){
+    public void forgotPassword(String email){
         UsersResource usersResource = getUsersResource();
-        List<UserRepresentation> userRepresentationsList = usersResource.searchByUsername(username, true);
+        List<UserRepresentation> userRepresentationsList = usersResource.searchByEmail(email, true);
         UserRepresentation userRepresentation= userRepresentationsList.get(0);
         UserResource userResource= usersResource.get(userRepresentation.getId());
         userResource.executeActionsEmail(List.of("UPDATE_PASSWORD"));

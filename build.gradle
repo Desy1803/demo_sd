@@ -27,6 +27,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok:1.18.34'
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
 	implementation 'org.springframework.security:spring-security-oauth2-jose'
+	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 	testCompileOnly 'org.projectlombok:lombok:1.18.34'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 	implementation 'org.springframework.boot:spring-boot-starter-web'  // Per RestTemplate

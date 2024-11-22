@@ -30,7 +30,7 @@ public class WebSecurityConfig {
 
         public CorsConfigurationSource corsConfigurationSource() {
             CorsConfiguration configuration = new CorsConfiguration();
-            configuration.setAllowedOrigins(Arrays.asList("http://localhost:**")); // Replace with your frontend URL
+            configuration.setAllowedOrigins(Arrays.asList("http://localhost:**"));
             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
             configuration.setAllowCredentials(true);
@@ -50,7 +50,7 @@ public class WebSecurityConfig {
                             .requestMatchers("/register").permitAll()
                             .requestMatchers("/send-verification-email").permitAll()
                             .requestMatchers("/verified-email").permitAll()
-                            .requestMatchers("articles/public").permitAll()
+                            .requestMatchers("/articles/public").permitAll()
                             .anyRequest().authenticated()
                     )
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

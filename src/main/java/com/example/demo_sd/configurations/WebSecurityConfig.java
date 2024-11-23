@@ -43,11 +43,12 @@ public class WebSecurityConfig {
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             return http
-                    .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
+                    .csrf(csrf -> csrf.disable())
                     .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/api/**").permitAll()
                             .requestMatchers("/login").permitAll()
                             .requestMatchers("/register").permitAll()
+                            .requestMatchers("/refresh").permitAll()
                             .requestMatchers("/send-verification-email").permitAll()
                             .requestMatchers("/verified-email").permitAll()
                             .requestMatchers("/articles/public").permitAll()

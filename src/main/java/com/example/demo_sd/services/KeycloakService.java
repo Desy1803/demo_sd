@@ -25,7 +25,7 @@ import java.util.*;
 public class KeycloakService {
 
 
-    private final String clientSecret = "ipGpTxezPErLjRTo8hoSBFkETX74coPh"; // Sostituisci con il tuo client secret
+    private final String clientSecret = "ipGpTxezPErLjRTo8hoSBFkETX74coPh";
 
     private final Keycloak keycloak;
     private String realm;
@@ -34,7 +34,6 @@ public class KeycloakService {
         this.keycloak = keycloak;
         realm="spring";
     }
-
 
 
     public KeycloakResponse loginUser(String username, String password) {
@@ -73,18 +72,23 @@ public class KeycloakService {
 
 
     }
-    public ResponseEntity<String> refreshToken(String refreshToken, String realm) {
+    public ResponseEntity<String> refreshToken(String refreshToken) {
         RestTemplate restTemplate = new RestTemplate();
 
-        String body = String.format("grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s",
-                "spring-app", clientSecret, refreshToken);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "refresh_token");
+        body.add("client_id", "spring-app");
+        body.add("client_secret", clientSecret);
+        body.add("refresh_token", refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
 
-        return restTemplate.exchange("http://localhost:8080/auth", HttpMethod.POST, entity, String.class, realm);
+        String tokenEndpoint = "http://localhost:8080/realms/spring/protocol/openid-connect/token";
+
+        return restTemplate.exchange(tokenEndpoint, HttpMethod.POST, requestEntity, String.class);
     }
 
 

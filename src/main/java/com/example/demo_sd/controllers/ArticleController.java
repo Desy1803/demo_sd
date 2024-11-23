@@ -14,10 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -131,24 +129,38 @@ public class ArticleController {
 
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ArticleEntity> updateArticleEntity(@PathVariable Long id, @RequestBody ArticleEntity articleDetails) {
-        return articleRepository.findById(id)
+    public ResponseEntity<ArticleEntity> updateArticleEntity( @RequestParam(required = true) String id,
+                                                              @RequestParam(required = false) String title,
+                                                              @RequestParam(required = false) String description,
+                                                              @RequestParam(required = false) String company,
+                                                              @RequestParam(required = false) String isPublic,
+                                                              @RequestParam(required = false) String isAi,
+                                                              @RequestParam(required = false) String date,
+                                                              @RequestParam(required = false) String category) {
+        System.out.println("Update article ");
+        boolean isPublic1 = Boolean.parseBoolean(isPublic);
+        boolean isAi1 = Boolean.parseBoolean(isAi);
+        return articleRepository.findById(Long.valueOf(id))
                 .map(article -> {
-                    article.setTitle(articleDetails.getTitle());
-                    article.setDescription(articleDetails.getDescription());
-                    article.setCompany(articleDetails.getCompany());
-                    article.setTimeUnit(articleDetails.getTimeUnit());
+                    article.setTitle(title);
+                    article.setDescription(description);
+                    article.setCompany(company);
+                    article.setTimeUnit(date);
+                    article.setUpdatedAt(LocalDateTime.now());
+                    article.setPublic(isPublic1);
+                    article.setAi(isAi1);
+                    article.setCategory(category);
                     return ResponseEntity.ok(articleRepository.save(article));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Object> deleteArticleEntity(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteArticleEntity(@RequestParam Long id) {
         return articleRepository.findById(id)
                 .map(article -> {
                     articleRepository.delete(article);

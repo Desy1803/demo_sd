@@ -6,7 +6,6 @@ import com.example.demo_sd.repositories.UserRepository;
 import com.example.demo_sd.requests.EmailVerification;
 import com.example.demo_sd.responses.KeycloakResponse;
 import com.example.demo_sd.services.KeycloakService;
-import org.jboss.resteasy.annotations.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +42,8 @@ public class KeycloakController {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(@RequestParam String refreshToken) {
-        return keycloakService.refreshToken(refreshToken, "spring");
+        System.out.println("Refreshing token ");
+        return keycloakService.refreshToken(refreshToken);
     }
 
     @PostMapping("/send-verification-email")
@@ -126,12 +126,6 @@ public class KeycloakController {
         try{
             keycloakService.deleteUser(userId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            //return userRepository.findById(id)
-                  //  .map(user -> {
-                    //    userRepository.delete(user);
-                      //  return ResponseEntity.ok().build();
-                    //})
-                    //.orElse(ResponseEntity.notFound().build());
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException();

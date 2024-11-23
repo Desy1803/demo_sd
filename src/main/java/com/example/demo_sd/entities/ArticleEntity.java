@@ -3,12 +3,15 @@ package com.example.demo_sd.entities;
 
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
-import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "articles")
+@Getter
+@Setter
 public class ArticleEntity {
 
     @Id
@@ -39,32 +42,9 @@ public class ArticleEntity {
     @Column
     private String category;
 
-    public boolean isAi() {
-        return isAi;
-    }
-
-    public void setAi(boolean AI) {
-        isAi = AI;
-    }
-
     @Column(name="is_ai")
     private boolean isAi;
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
-    }
 
     @Column(name = "created_at")
     @Timestamp
@@ -87,72 +67,6 @@ public class ArticleEntity {
         this.updatedAt=updatedAt;
     }
     public ArticleEntity() {}
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    public String getTimeUnit() {
-        return timeUnit;
-    }
-
-    public void setTimeUnit(String timeUnit) {
-        this.timeUnit = timeUnit;
-    }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime createdAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
 
 
 

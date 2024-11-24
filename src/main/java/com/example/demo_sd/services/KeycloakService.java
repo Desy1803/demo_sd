@@ -27,8 +27,8 @@ public class KeycloakService {
 
     private final String clientSecret = "ipGpTxezPErLjRTo8hoSBFkETX74coPh";
 
-    private final Keycloak keycloak;
-    private String realm;
+    private static Keycloak keycloak;
+    private static String realm;
 
     public KeycloakService( Keycloak keycloak) {
         this.keycloak = keycloak;
@@ -164,11 +164,11 @@ public class KeycloakService {
         return userRepresentation.isEmailVerified();
     }
 
-    private UsersResource getUsersResource(){
+    private static UsersResource getUsersResource(){
         return keycloak.realm(realm).users();
     }
 
-    private UserResource getUser(String userId){
+    public static UserResource getUser(String userId){
         UsersResource usersResource = getUsersResource();
         return usersResource.get(userId);
     }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true) // Enable method-level security
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
         public CorsConfigurationSource corsConfigurationSource() {
@@ -52,6 +52,7 @@ public class WebSecurityConfig {
                             .requestMatchers("/send-verification-email").permitAll()
                             .requestMatchers("/verified-email").permitAll()
                             .requestMatchers("/articles/public").permitAll()
+                            .requestMatchers("/articles/get-image").permitAll()
                             .anyRequest().authenticated()
                     )
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

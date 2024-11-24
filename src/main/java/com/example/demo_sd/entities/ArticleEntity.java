@@ -3,7 +3,9 @@ package com.example.demo_sd.entities;
 
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
 @Table(name = "articles")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ArticleEntity {
 
     @Id
@@ -21,7 +25,7 @@ public class ArticleEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "company", nullable = false)
@@ -30,8 +34,9 @@ public class ArticleEntity {
     @Column(name = "author", nullable = false)
     private String author;
 
-    @Column(name="image_url")
-    private String imageUrl;
+    @Column(name = "image_url")
+    private byte[] imageUrl;
+
 
     @Column(name = "time_unit")
     private String timeUnit;
@@ -54,19 +59,7 @@ public class ArticleEntity {
     @Timestamp
     private LocalDateTime updatedAt;
 
-    public ArticleEntity(String author, String title, String description, String company, String timeUnit, boolean isAi, boolean isPublic, String category, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.author=author;
-        this.title = title;
-        this.description = description;
-        this.company = company;
-        this.timeUnit = timeUnit;
-        this.isAi=isAi;
-        this.isPublic=isPublic;
-        this.category=category;
-        this.createdAt=createdAt;
-        this.updatedAt=updatedAt;
-    }
-    public ArticleEntity() {}
+
 
 
 

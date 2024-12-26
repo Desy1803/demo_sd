@@ -6,6 +6,8 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,28 @@ public class ArticlesService {
             }
             if (criteria.getCreatedAt() != null) {
                 predicates.add(cb.equal(root.get("createdAt"), criteria.getCreatedAt()));
+            }
+            if (!isNullOrEmpty(criteria.getDate())) {
+                LocalDate now = LocalDate.now();
+                LocalDate startDate = null;
+
+                switch (criteria.getDate()) {
+                    case "Last Week":
+                        startDate = now.minus(1, ChronoUnit.WEEKS);
+                        break;
+                    case "Last Month":
+                        startDate = now.minus(1, ChronoUnit.MONTHS);
+                        break;
+                    case "Last Year":
+                        startDate = now.minus(1, ChronoUnit.YEARS);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid date value: " + criteria.getDate());
+                }
+
+                if (startDate != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), startDate));
+                }
             }
 
             // Se non ci sono criteri specifici, restituisci tutti gli articoli (nessun filtro)

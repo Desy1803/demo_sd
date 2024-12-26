@@ -2,12 +2,10 @@ package com.example.demo_sd.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -50,6 +48,9 @@ public class WebSecurityConfig {
                             .requestMatchers("/register").permitAll()
                             .requestMatchers("/refresh").permitAll()
                             .requestMatchers("/send-verification-email").permitAll()
+                            .requestMatchers("/api/stocks/*").permitAll()
+                            .requestMatchers("/api/stocks/companies").permitAll()
+                            .requestMatchers("/api/stocks/latest-info/*").permitAll()
                             .requestMatchers("/verified-email").permitAll()
                             .requestMatchers("/articles/public").permitAll()
                             .requestMatchers("/articles/get-image").permitAll()

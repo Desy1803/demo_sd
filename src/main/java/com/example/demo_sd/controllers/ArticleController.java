@@ -43,7 +43,6 @@ public class ArticleController {
         byte[] byteImage = article.getImageUrl().getBytes("UTF-8");
         LocalDateTime now = LocalDateTime.now();
         ArticleEntity articleEntity = new ArticleEntity(null, article.getTitle(), article.getDescription(), article.getCompany(), username,  byteImage ,article.getDate(),article.isPublic(), article.getCategory(), article.isAi(),now, now);
-        System.out.println("Sending "+ articleEntity);
         articleRepository.save(articleEntity);
         System.out.println("Saved article");
         return ResponseEntity.ok(articleEntity);
@@ -111,31 +110,29 @@ public class ArticleController {
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String company,
-            @RequestParam(required = false) String isPublic,
             @RequestParam(required = false) String isAi,
             @RequestParam(required = false) String date,
-            @RequestParam(required = false) String user,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String createdAt
     ) {
         try {
             System.out.println("Getting private articles ");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-            LocalDateTime parsedCreatedAt = (createdAt != null && !createdAt.isEmpty())
-                    ? LocalDateTime.parse(createdAt, formatter)
-                    : null;
+
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            boolean isAi1 = Boolean.parseBoolean(isAi);
+            if(category.equals("All"))
+                category=null;
+            if(date.equals("All"))
+                date=null;
             SearchArticleCriteria criteria = new SearchArticleCriteria(
                     id,
                     title,
                     company,
                     null,
-                    isAi1,
+                    null,
                     date,
                     username,
                     category,
-                    parsedCreatedAt);
+                    null);
 
             List<ArticleEntity> articlesEntity = articleRepository.findAll(ArticlesService.getSpecification(criteria));
             List<ArticleResponse> articlesResponse = articlesEntity.stream()

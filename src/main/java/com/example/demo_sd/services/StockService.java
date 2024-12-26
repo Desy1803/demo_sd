@@ -51,7 +51,7 @@ public class StockService {
                         .queryParam("datatype", bestMatchDto.getDatatype())
                         .build())
                 .retrieve()
-                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
+                .bodyToMono(String.class)
                 .block(); // Blocking operation per ottenere la risposta
     }
 
@@ -78,8 +78,8 @@ public class StockService {
                         .queryParam("function", function)
                         .build())
                 .retrieve()
-                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
-                .block(); // Blocking operation per ottenere la risposta
+                .bodyToMono(String.class)
+                .block();
     }
     public String getFundamentalData(String function, String symbol){ //function=OVERVIEW, symbol = IBM
         return this.webClient.get()
@@ -89,8 +89,8 @@ public class StockService {
                         .queryParam("function", function)
                         .build())
                 .retrieve()
-                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
-                .block(); // Blocking operation per ottenere la risposta
+                .bodyToMono(String.class)
+                .block();
     }
 
     public String getDividends(String function, String symbol){ //function=OVERVIEW, symbol = IBM
@@ -101,8 +101,8 @@ public class StockService {
                         .queryParam("function", function)
                         .build())
                 .retrieve()
-                .bodyToMono(String.class) // Assumiamo che l'output sia in formato JSON o CSV come Stringa
-                .block(); // Blocking operation per ottenere la risposta
+                .bodyToMono(String.class)
+                .block();
     }
 
     public Mono<String> sendRequestCoreStock(String function, String symbol, String datatype, String type, String keywords, String outputsize) {

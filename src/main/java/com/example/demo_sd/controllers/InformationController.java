@@ -1,6 +1,7 @@
 package com.example.demo_sd.controllers;
 
 import com.example.demo_sd.dto.Company;
+import com.example.demo_sd.dto.PaginatedResponse;
 import com.example.demo_sd.enumerations.DataType;
 import com.example.demo_sd.enumerations.TimeSeriesType;
 import com.example.demo_sd.services.StockService;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,7 +91,6 @@ public class InformationController {
         companies.add(new Company("Volkswagen AG", "VWAGY", "Consumer Discretionary"));
         companies.add(new Company("Honda Motor Co., Ltd.", "HMC", "Consumer Discretionary"));
         companies.add(new Company("Toyota Motor Corporation", "TM", "Consumer Discretionary"));
-        companies.add(new Company("ABB Ltd", "ABB", "Industrials"));
         companies.add(new Company("Siemens AG", "SIEGY", "Industrials"));
         companies.add(new Company("Schneider Electric SE", "SBGSF", "Industrials"));
         companies.add(new Company("United Parcel Service, Inc.", "UPS", "Industrials"));
@@ -120,7 +121,6 @@ public class InformationController {
         companies.add(new Company("Nokia Corporation", "NOK", "Technology"));
         companies.add(new Company("Ericsson", "ERIC", "Technology"));
         companies.add(new Company("Toshiba Corporation", "TOSYY", "Technology"));
-        companies.add(new Company("Intel Corporation", "INTC", "Technology"));
         companies.add(new Company("Advanced Micro Devices, Inc.", "AMD", "Technology"));
         companies.add(new Company("Micron Technology, Inc.", "MU", "Technology"));
         companies.add(new Company("Broadcom Inc.", "AVGO", "Technology"));
@@ -145,27 +145,53 @@ public class InformationController {
     }
 
     @GetMapping("/companies")
-    public List<Company> getAllCompanies() {
-        System.out.println("Getting all companies");
-        return companies;
+    public PaginatedResponse<Company> getAllCompanies(
+            @RequestParam(defaultValue = "1", required = false) int page,
+            @RequestParam(defaultValue = "10", required = false) int size) {
+
+        System.out.println("Getting companies");
+        if (page==-1)
+            return new PaginatedResponse<>(companies, 0, companies.size(), 1);
+
+        List<Company> paginatedCompanies = paginate(companies, page, size);
+
+
+        int totalCount = companies.size();
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+
+        return new PaginatedResponse<>(paginatedCompanies, totalCount, page, totalPages);
     }
-
     @GetMapping("/companies/search")
-    public List<Company> searchCompanies(@RequestParam String query) {
-
-        System.out.println("Getting some companies");
+    public List<Company> searchCompanies(
+            @RequestParam String query) {
         return companies.stream()
                 .filter(company -> company.getName().toLowerCase().contains(query.toLowerCase()) ||
                         company.getSymbol().toLowerCase().contains(query.toLowerCase()) ||
                         company.getCategory().toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
+
+    }
+
+
+    private List<Company> paginate(List<Company> list, int page, int size) {
+        list.sort(Comparator.comparing(Company::getName));
+
+        int start = (page - 1) * size;
+        int end = Math.min(start + size, list.size());
+
+        if (start >= list.size()) {
+            return new ArrayList<>();
+        }
+
+        return list.subList(start, end);
     }
 
     @GetMapping("/all")
     public Mono<String> getStockData(@RequestParam String symbol,
-                                     @RequestParam(defaultValue = "compact") String outputsize,
-                                     @RequestParam(defaultValue = "json") DataType datatype,
-                                     @RequestParam(defaultValue = "TIME_SERIES_DAILY") TimeSeriesType type) {
+                                     @RequestParam(defaultValue = "compact", required = false) String outputsize,
+                                     @RequestParam(defaultValue = "DATA_TYPE_JSON", required = false) DataType datatype,
+                                     @RequestParam(defaultValue = "TIME_SERIES_DAILY", required = false) TimeSeriesType type) {
         return stockService.sendRequestCoreStock(null, symbol, datatype.getValue(), type.getValue(), null, outputsize);
     }
 
@@ -177,11 +203,10 @@ public class InformationController {
         return stockService.sendRequestCoreStock(function, null, datatype.getValue(), null, keywords, null);
     }
 
-    @GetMapping("/latestInfo")
-    public Mono<String> getLatestInfo(@RequestParam String function,
-                                             @RequestParam String symbol,
-                                             @RequestParam(required = false) DataType datatype) {
-        return stockService.sendRequestCoreStock(function, symbol, datatype.getValue(), null, null, null);
+    @GetMapping("/latest-info")
+
+    public Mono<String> getLatestInfo(@RequestParam String symbol ) {
+        return stockService.sendRequestCoreStock("OVERVIEW", symbol, "json", null, null, null);
     }
 
     @GetMapping("/getGlobalStatus")

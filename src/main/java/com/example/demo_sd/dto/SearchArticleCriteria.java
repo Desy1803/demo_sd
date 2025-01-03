@@ -26,6 +26,8 @@ public class SearchArticleCriteria {
     @JsonProperty
         private String date;
     @JsonProperty
+    private String timeUnit;
+    @JsonProperty
         private String user;
 
     @JsonProperty

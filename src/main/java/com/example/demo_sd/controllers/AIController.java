@@ -176,8 +176,10 @@ class AIController {
 							.setTools(tools)
 							.setSystemInstruction(systemInstruction)
 							.build();
-
-			var text6_1 = "***Title: Financial Analysis of"+data.company()+"'s "+data.category()+"***\n" +
+			String addDate="";
+			if(data.date()!=null)
+				addDate=" for the fiscal year "+ data.date().getYear();
+			var text6_1 = "***Title: Financial Analysis of"+data.company()+"'s "+data.category()+addDate+"***\n" +
 					"\n" +
 					"**I. Introduction**\n" +
 					"\n" +

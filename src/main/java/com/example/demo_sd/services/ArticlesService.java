@@ -35,7 +35,7 @@ public class ArticlesService {
             if (criteria.getIsAi() != null) {
                 predicates.add(cb.equal(root.get("isAi"), criteria.getIsAi()));
             }
-            if (!isNullOrEmpty(criteria.getDate())) {
+            if (!isNullOrEmpty(criteria.getTimeUnit())) {
                 predicates.add(cb.equal(root.get("timeUnit"), criteria.getDate()));
             }
             if (!isNullOrEmpty(criteria.getUser())) {
@@ -50,32 +50,35 @@ public class ArticlesService {
             if (!isNullOrEmpty(criteria.getDate())) {
                 LocalDate now = LocalDate.now();
                 LocalDate startDate = null;
+                LocalDate endDate = null;
 
                 switch (criteria.getDate()) {
                     case "Last Week":
-                        startDate = now.minus(1, ChronoUnit.WEEKS);
+                        startDate = now.minus(1, ChronoUnit.WEEKS).with(java.time.DayOfWeek.MONDAY);
+                        endDate = startDate.plusDays(6);
                         break;
                     case "Last Month":
-                        startDate = now.minus(1, ChronoUnit.MONTHS);
+                        startDate = now.minus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
+                        endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
                         break;
                     case "Last Year":
-                        startDate = now.minus(1, ChronoUnit.YEARS);
+                        startDate = now.minus(1, ChronoUnit.YEARS).withDayOfYear(1);
+                        endDate = startDate.withDayOfYear(startDate.lengthOfYear());
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid date value: " + criteria.getDate());
                 }
 
-                if (startDate != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), startDate));
+                if (startDate != null && endDate != null) {
+                    predicates.add(cb.between(root.get("createdAt"), startDate, endDate));
                 }
             }
 
-            // Se non ci sono criteri specifici, restituisci tutti gli articoli (nessun filtro)
+
             if (predicates.isEmpty()) {
-                return cb.conjunction(); // Restituisce una condizione sempre vera
+                return cb.conjunction();
             }
 
-            // Combina i criteri in un AND
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

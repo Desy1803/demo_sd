@@ -30,7 +30,7 @@ public class ArticleResponse {
     private boolean isAi;
 
     @JsonProperty
-    private String date;
+    private String timeUnit;
 
     @JsonProperty
     private String category;
@@ -51,7 +51,7 @@ public class ArticleResponse {
         articleResponse.setDescription(articleEntity.getDescription());
         articleResponse.setPublic(articleEntity.isPublic());
         articleResponse.setAi(articleEntity.isAi());
-        articleResponse.setDate(articleEntity.getTimeUnit());
+        articleResponse.setTimeUnit(articleEntity.getTimeUnit());
         articleResponse.setCategory(articleEntity.getCategory());
         articleResponse.setAuthorEmail(authorEmail);
         articleResponse.setAuthorUsername(authorUsername);

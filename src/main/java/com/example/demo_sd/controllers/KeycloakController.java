@@ -1,17 +1,20 @@
 package com.example.demo_sd.controllers;
 
 import com.example.demo_sd.dto.UserRequest;
-import com.example.demo_sd.entities.UserEntity;
-import com.example.demo_sd.repositories.UserRepository;
+import com.example.demo_sd.dto.UserResponse;
+import com.example.demo_sd.dto.UserUpdateRequest;
 import com.example.demo_sd.requests.EmailVerification;
 import com.example.demo_sd.responses.KeycloakResponse;
 import com.example.demo_sd.services.KeycloakService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.NotFoundException;
 import java.util.Map;
 
 @RestController
@@ -20,8 +23,6 @@ import java.util.Map;
 public class KeycloakController {
 
     private final KeycloakService keycloakService;
-    @Autowired
-    private UserRepository userRepository;
 
     public KeycloakController(KeycloakService keycloakService) {
         this.keycloakService = keycloakService;
@@ -87,45 +88,116 @@ public class KeycloakController {
 
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/get-user")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
-        return userRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public UserResponse getUserById() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() != null) {
+            Object principal = authentication.getPrincipal();
+
+            if (principal != null) {
+                System.out.println("Principal class: " + principal.getClass().getName());
+                if (principal instanceof Jwt) {
+                    Jwt jwt = (Jwt) principal;
+                    String userId = jwt.getClaimAsString("sub");
+                    System.out.println("user id: " + userId);
+                    return new UserResponse(keycloakService.getUserInfo(userId));
+                } else {
+                    System.out.println("Principal is not an instance of Jwt");
+                    throw new NotFoundException("Not found");
+                }
+            } else {
+                System.out.println("Principal is null");
+                throw new NotFoundException("Not found");
+            }
+
+        }else {
+            throw new NotFoundException("Not found");
+        }
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update-user")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserEntity> updateUser(@PathVariable Long id, @RequestBody UserEntity userDetails) {
-        return userRepository.findById(id)
-                .map(user -> {
-                    user.setFirstName(userDetails.getFirstName());
-                    user.setLastName(userDetails.getLastName());
-                    user.setEmail(userDetails.getEmail());
-                    user.setPhoneNumber(userDetails.getPhoneNumber());
-                    user.setAddress(userDetails.getAddress());
-                    user.setCity(userDetails.getCity());
-                    user.setCountry(userDetails.getCountry());
-                    user.setDateOfBirth(userDetails.getDateOfBirth());
-                    return ResponseEntity.ok(userRepository.save(user));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
+    public ResponseEntity<Boolean> updateUser(@RequestParam(required = false) String firstName,
+                                     @RequestParam(required = false) String lastName,
+                                     @RequestParam(required = false) String username) {
+        UserUpdateRequest userDetails = new UserUpdateRequest(username, firstName, lastName);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication != null && authentication.getPrincipal() != null) {
+            Object principal = authentication.getPrincipal();
+
+            System.out.println("Principal class: " + principal.getClass().getName());
+            if (principal instanceof Jwt) {
+                Jwt jwt = (Jwt) principal;
+                String userId = jwt.getClaimAsString("sub");
+                if (userId == null) {
+                    throw new IllegalArgumentException("Claim 'sub' not found in JWT");
+                }
+
+                keycloakService.updateUserInfo(userId, userDetails);
+                return ResponseEntity.ok(Boolean.parseBoolean("true"));
+            } else {
+                throw new IllegalArgumentException("Principal is not an instance of Jwt");
+            }
+        }else {
+            throw new NotFoundException("Not found");
+        }
+
+    }
+    @PostMapping("/log-out")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity logOutUser( ) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() != null) {
+            Object principal = authentication.getPrincipal();
+
+            System.out.println("Principal class: " + principal.getClass().getName());
+            if (principal instanceof Jwt) {
+                Jwt jwt = (Jwt) principal;
+                String userId = jwt.getClaimAsString("sub");
+                keycloakService.logoutUser(userId);
+                return ResponseEntity.ok().build();
+            } else {
+                throw new NotFoundException("Not found");
+            }
+        }else {
+            throw new NotFoundException("Not found");
+        }
+
+    }
     @PostMapping("/forgot-password")
     public ResponseEntity<Boolean> forgotPassword(@RequestBody EmailVerification email){
         keycloakService.forgotPassword(email.getEmail());
         return new ResponseEntity<>(true, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping()
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
+    public ResponseEntity<?> deleteUser() {
         try{
-            keycloakService.deleteUser(userId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null && authentication.getPrincipal() != null) {
+                Object principal = authentication.getPrincipal();
+
+                System.out.println("Principal class: " + principal.getClass().getName());
+                if (principal instanceof Jwt) {
+                    Jwt jwt = (Jwt) principal;
+                    String userId = jwt.getClaimAsString("sub");
+                    keycloakService.deleteUser(userId);
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                } else {
+                    throw new NotFoundException("Not found");
+                }
+            }else {
+                throw new NotFoundException("Not found");
+            }
+
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException();

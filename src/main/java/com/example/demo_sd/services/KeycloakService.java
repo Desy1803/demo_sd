@@ -1,6 +1,7 @@
 package com.example.demo_sd.services;
 
 import com.example.demo_sd.dto.UserRequest;
+import com.example.demo_sd.dto.UserUpdateRequest;
 import com.example.demo_sd.responses.KeycloakResponse;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -93,18 +94,11 @@ public class KeycloakService {
 
 
     public void createUser(UserRequest userRequest) {
-        Map<String, List<String>> attributes = new HashMap<>();
-        attributes.put("address", List.of(userRequest.getAddress()));
-        attributes.put("country", List.of(userRequest.getCountry()));
-        attributes.put("city", List.of(userRequest.getCity()));
-        attributes.put("address", List.of(userRequest.getAddress()));
-        attributes.put("phoneNumber", List.of(userRequest.getPhoneNumber()));
         UserRepresentation user = new UserRepresentation();
         user.setUsername(userRequest.getUsername());
         user.setEmail(userRequest.getEmail());
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
-        user.setAttributes(attributes);
         user.setEnabled(true);
         user.setEmailVerified(false);
 
@@ -167,6 +161,45 @@ public class KeycloakService {
     private static UsersResource getUsersResource(){
         return keycloak.realm(realm).users();
     }
+
+    public UserRepresentation getUserInfo(String userId) {
+        try {
+            UserResource userResource = getUser(userId);
+            return userResource.toRepresentation();
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving user info: " + e.getMessage(), e);
+
+        }
+    }
+
+    public void updateUserInfo(String userId, UserUpdateRequest userRequest) {
+        try {
+            System.out.println("Start updating user info"+userRequest);
+            UserResource userResource = getUser(userId);
+            UserRepresentation user = userResource.toRepresentation();
+
+            user.setUsername(userRequest.getUsername());
+            user.setFirstName(userRequest.getFirstName());
+            user.setLastName(userRequest.getLastName());
+            user.setEmail(user.getEmail());
+            userResource.update(user);
+            System.out.println("User updated in Keycloak");
+        } catch (Exception e) {
+            System.err.println("Error updating user info: " + e.getMessage());
+            throw new RuntimeException("Error updating user info: " + e.getMessage(), e);
+        }
+    }
+
+    public void logoutUser(String userId) {
+        try {
+            keycloak.realm(realm).users().get(userId).logout();
+            System.out.println("User logged out successfully.");
+        } catch (Exception e) {
+            throw new RuntimeException("Error logging out user: " + e.getMessage(), e);
+        }
+    }
+
+
 
     public static UserResource getUser(String userId){
         UsersResource usersResource = getUsersResource();

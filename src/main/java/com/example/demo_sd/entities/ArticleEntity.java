@@ -37,7 +37,6 @@ public class ArticleEntity {
     @Column(name = "image_url")
     private byte[] imageUrl;
 
-
     @Column(name = "time_unit")
     private String timeUnit;
 
@@ -50,7 +49,6 @@ public class ArticleEntity {
     @Column(name="is_ai")
     private boolean isAi;
 
-
     @Column(name = "created_at")
     @Timestamp
     private LocalDateTime createdAt;
@@ -58,8 +56,6 @@ public class ArticleEntity {
     @Column(name = "updated_at")
     @Timestamp
     private LocalDateTime updatedAt;
-
-
 
 
 

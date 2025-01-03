@@ -29,8 +29,8 @@ public class ArticleRequest {
     @JsonProperty
     private boolean isAi;
 
-    @JsonProperty
-    private String date;
+    @JsonProperty("date")
+    private String timeUnit;
 
     @JsonProperty
     private String category;

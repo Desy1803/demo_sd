@@ -52,7 +52,7 @@ public class WebSecurityConfig {
                             .requestMatchers("/api/stocks/companies").permitAll()
                             .requestMatchers("/api/stocks/latest-info/*").permitAll()
                             .requestMatchers("/verified-email").permitAll()
-                            .requestMatchers("/articles/public").permitAll()
+                            .requestMatchers("/api/articles/public").permitAll()
                             .requestMatchers("/articles/get-image").permitAll()
                             .anyRequest().authenticated()
                     )
